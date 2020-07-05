@@ -1,0 +1,4 @@
+build --cxxopt=-std=c++2a
+build --cxxopt=-Wmissing-declarations
+build --cxxopt=-Wall
+build --cxxopt=-Wextra

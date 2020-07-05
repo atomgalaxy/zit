@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "gcc10",
+            "intelliSenseMode": "gcc-x64",
+            "includePath": [
+                "${workspaceRoot}"
+            ],
+            "compilerPath": "/usr/bin/g++",
+            "cppStandard": "c++20",
+            "compileCommands": "compile_commands.json",
+        }
+    ],
+    "version": 4
+}

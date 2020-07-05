@@ -1,0 +1,3 @@
+bazel-*/*
+bazel-*
+compile_commands.json
