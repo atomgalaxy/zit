@@ -7,7 +7,7 @@
 
 namespace zit {
 
-#define ZIT_TAG_METH(type, name, base, constness)                              \
+#define ZIT_PRIVATE_TAG_METH(type, name, base, constness)                      \
   template <typename... As>                                                    \
   auto name(As &&... as) constness noexcept(                                   \
       noexcept(std::declval<type>()(std::declval<base constness>(),            \
@@ -19,7 +19,25 @@ namespace zit {
   }                                                                            \
   static_assert(true, "require semi at end of method")
 
-#define ZIT_TAG_INVOKE_CPO(type, obj)                                          \
+/**
+ * Define a customization point object (CPO) which can be used with `handle`.
+ *
+ * Example:
+ *
+ * ```cpp
+ * namespace my_namespace {
+ *   ZIT_CPO(honk_t, honk); // honk_t is the type, honk the name.
+ *   ZIT_CPO(set_throttle_t, set_throttle);
+ * }
+ * namespace possibly_other_namespace {
+ *   struct my_impl; // forward declare
+ *   struct my_handle : zit::handle<my_impl,
+ *                                  my_namespace::honk,
+ *                                  my_namespace::set_throttle> {};
+ * }
+ * ```
+ */
+#define ZIT_CPO(type, obj)                                                     \
   inline constexpr struct type final {                                         \
     template <typename... As>                                                  \
     inline constexpr auto operator()(As &&... as) const                        \
@@ -29,10 +47,10 @@ namespace zit {
     }                                                                          \
     template <typename Base>                                                   \
     struct crtp {                                                              \
-      ZIT_TAG_METH(type, obj, Base, &);                                        \
-      ZIT_TAG_METH(type, obj, Base, const &);                                  \
-      ZIT_TAG_METH(type, obj, Base, &&);                                       \
-      ZIT_TAG_METH(type, obj, Base, const &&);                                 \
+      ZIT_PRIVATE_TAG_METH(type, obj, Base, &);                                \
+      ZIT_PRIVATE_TAG_METH(type, obj, Base, const &);                          \
+      ZIT_PRIVATE_TAG_METH(type, obj, Base, &&);                               \
+      ZIT_PRIVATE_TAG_METH(type, obj, Base, const &&);                         \
     };                                                                         \
   } obj{};                                                                     \
   static_assert("require semicolon at end of macro")

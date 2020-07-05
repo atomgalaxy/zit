@@ -6,7 +6,7 @@
 
 namespace cars {
 
-ZIT_TAG_INVOKE_CPO(honk_t, honk);
+ZIT_CPO(honk_t, honk);
 
 namespace _impl_lada {
 struct lada;
