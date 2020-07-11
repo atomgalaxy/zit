@@ -5,3 +5,5 @@ compile_commands.json
 x64/*
 Debug/*
 atomgalaxy.vcxproj.user
+build-cmake/*
+.vscode/*

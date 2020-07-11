@@ -4,8 +4,13 @@ namespace cars::_impl_lada {
 
 struct lada {
   // zit::handle requirements
+  explicit lada(int times_) : times{times_} {}
+  lada(lada const &) = default;
+  lada &operator=(lada const &) = default;
+
   int times;
 };
+
 auto tag_invoke(zit::construct_t, lada *l, int times) -> lada * {
   return zit::construct.default_impl(l, times);
 }
@@ -17,7 +22,8 @@ auto tag_invoke(zit::destroy_t, lada *x) -> void {
 }
 
 // other ops
-auto tag_invoke(cars::honk_t, lada const &self, std::ostream &o) -> std::ostream & {
+auto tag_invoke(cars::honk_t, lada const &self, std::ostream &o)
+    -> std::ostream & {
   for (int i = 0; i < self.times; ++i) {
     if (i != 0) {
       o << " ";

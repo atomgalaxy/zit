@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tag_invoke.hpp"
+#include "taggie/tag_invoke.hpp"
 
 #include <memory>
 #include <type_traits>
@@ -9,13 +9,12 @@ namespace zit {
 
 #define ZIT_PRIVATE_TAG_METH(type, name, base, constness)                      \
   template <typename... As>                                                    \
-  auto name(As &&... as) constness noexcept(                                   \
-      noexcept(std::declval<type>()(std::declval<base constness>(),            \
-                                    std::forward<As>(as)...)))                 \
-      ->decltype(std::declval<type>()(std::declval<base constness>(),          \
-                                      std::forward<As>(as)...)) {              \
-    return type{}(static_cast<base constness>(*this),                          \
-                  std::forward<As>(as)...);                                    \
+  auto name(As &&... as)                                                       \
+      constness noexcept(noexcept(std::declval<type>()(                        \
+                             std::declval<base constness>(), (As &&)(as)...))) \
+          ->decltype(std::declval<type>()(std::declval<base constness>(),      \
+                                          (As &&)(as)...)) {                   \
+    return type{}(static_cast<base constness>(*this), (As &&)(as)...);         \
   }                                                                            \
   static_assert(true, "require semi at end of method")
 
@@ -41,9 +40,9 @@ namespace zit {
   inline constexpr struct type final {                                         \
     template <typename... As>                                                  \
     inline constexpr auto operator()(As &&... as) const                        \
-        noexcept(zit::is_nothrow_tag_invocable_v<type, As &&...>)              \
-            -> zit::tag_invoke_result_t<type, As &&...> {                      \
-      return zit::tag_invoke(*this, (As &&) as...);                            \
+        noexcept(::taggie::is_nothrow_tag_invocable_v<type, As &&...>)            \
+            -> ::taggie::tag_invoke_result_t<type, As &&...> {                    \
+      return ::taggie::tag_invoke(*this, (As &&) as...);                          \
     }                                                                          \
     template <typename Base>                                                   \
     struct crtp {                                                              \
@@ -58,24 +57,26 @@ namespace zit {
 inline constexpr struct construct_t final {
   template <typename... As>
   inline constexpr auto operator()(As &&... as) const
-      noexcept(zit::is_nothrow_tag_invocable_v<construct_t, As &&...>)
-          -> zit::tag_invoke_result_t<construct_t, As &&...> {
-    return zit::tag_invoke(*this, (As &&) as...);
+      noexcept(::taggie::is_nothrow_tag_invocable_v<construct_t, As &&...>)
+          -> ::taggie::tag_invoke_result_t<construct_t, As &&...> {
+    return ::taggie::tag_invoke(*this, (As &&) as...);
   }
+
   template <typename Impl, typename... As>
-  static constexpr auto default_impl(
-      Impl * /*always nullptr*/,
-      As &&... as) noexcept(noexcept(new Impl(std::forward<As>(as)...)))
-      -> decltype(new Impl(std::forward<As>(as)...)) {
-    return new Impl(std::forward<As>(as)...);
+  static constexpr auto
+  default_impl(Impl * /*always nullptr*/,
+               As &&... as) noexcept(noexcept(new Impl((As &&) as...)))
+      -> decltype(new Impl((As &&) as...)) {
+    return new Impl((As &&) as...);
   }
 } construct{};
+
 inline constexpr struct destroy_t final {
   template <typename... As>
   inline constexpr auto operator()(As &&... as) const
-      noexcept(zit::is_nothrow_tag_invocable_v<destroy_t, As &&...>)
-          -> zit::tag_invoke_result_t<destroy_t, As &&...> {
-    return zit::tag_invoke(*this, (As &&) as...);
+      noexcept(::taggie::is_nothrow_tag_invocable_v<destroy_t, As &&...>)
+          -> ::taggie::tag_invoke_result_t<destroy_t, As &&...> {
+    return ::taggie::tag_invoke(*this, (As &&) as...);
   }
   template <typename Impl>
   static constexpr auto default_impl(Impl *obj) {
@@ -90,9 +91,8 @@ using crtp_base =
 template <typename Impl, auto const &... cpos>
 struct handle : crtp_base<handle<Impl, cpos...>, cpos>... {
   template <typename... Args>
-    handle(Args&&... args)
-      : _impl(zit::construct((Impl *)nullptr,
-                             std::forward<decltype(args)>(args)...)) {}
+  handle(Args &&... args)
+      : _impl(::zit::construct((Impl *)nullptr, (Args &&) args...)) {}
 
   handle(handle const &other) : handle(*other._impl) {}
 
@@ -102,15 +102,11 @@ struct handle : crtp_base<handle<Impl, cpos...>, cpos>... {
     return *this;
   }
 
-  template<typename CPO, typename H, typename... AS>
-  friend inline auto tag_invoke(CPO cpo, H &&h, AS &&... as) noexcept(
-      noexcept(cpo(zit::forward_like<decltype(h)>(*h._impl),
-                   std::forward<decltype(as)>(as)...)))
-      -> decltype(cpo(zit::forward_like<decltype(h)>(*h._impl),
-                      std::forward<decltype(as)>(as)...)) 
-  {
-    return cpo(zit::forward_like<decltype(h)>(*h._impl),
-               std::forward<decltype(as)>(as)...);
+  template <typename CPO, typename H, typename... As>
+  friend inline auto tag_invoke(CPO cpo, H &&h, As &&... as) noexcept(
+      noexcept(cpo(::taggie::forward_like<H &&>(*h._impl), (As &&) as...)))
+      -> decltype(cpo(taggie::forward_like<H &&>(*h._impl), (As &&) as...)) {
+    return cpo(taggie::forward_like<H &&>(*h._impl), (As &&) as...);
   }
 
 private:

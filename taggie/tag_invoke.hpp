@@ -5,7 +5,15 @@
 #include <type_traits>
 #include <utility>
 
-namespace zit {
+#if defined(__GNUG__)
+#define always_inline [[gnu::always_inline]]
+#elif defined(__MSC_VER)
+#define always_inline __inline
+#else
+#define always_inline
+#endif
+
+namespace taggie {
 namespace _tag_invoke {
 void tag_invoke();
 
@@ -48,10 +56,9 @@ struct defer {
 struct empty {};
 } // namespace _tag_invoke
 
-namespace _tag_invoke_cpo {
+inline namespace _tag_invoke_cpo {
 inline constexpr _tag_invoke::_fn tag_invoke{};
 }
-using namespace _tag_invoke_cpo;
 
 template <auto &CPO>
 using tag_t = std::remove_cvref_t<decltype(CPO)>;
@@ -105,10 +112,11 @@ using copy_volatile_t =
 template <typename T, typename U>
 using copy_cvref_t = copy_const_t<T, copy_volatile_t<T, copy_ref_t<T, U>>>;
 template <typename T, typename U>
-[[gnu::always_inline]] inline constexpr auto forward_like(U &&x) noexcept
+always_inline inline constexpr auto forward_like(U &&x) noexcept
     -> copy_cvref_t<T, std::remove_reference_t<U>> {
   return std::forward<copy_cvref_t<T, std::remove_reference_t<U>>>(x);
 }
 
-
 } // namespace zit
+
+#undef always_inline

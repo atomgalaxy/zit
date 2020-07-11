@@ -1,5 +1,4 @@
-#include "../zit/tag_invoke.hpp"
-#include "../zit/zit.hpp"
+#include "zit/zit.hpp"
 
 #include <memory>
 #include <ostream>
