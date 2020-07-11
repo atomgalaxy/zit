@@ -56,7 +56,7 @@ Quick Intro
         auto tag_invoke(zit::construct, my_impl*, my_impl const&) -> my_impl*; // copy
         void tag_invoke(zit::destroy, my_impl*); // destructor interface
 
-        // forward declate customization point implementations
+        // forward declare customization point implementations
         void tag_invoke(my_namespace::honk_t, int n, std::ostream& out);
         void tag_invoke(my_namespace::honk_t, std::ostream& out); // default n
         void tag_invoke(my_namespace::set_throttle_t, int percent);
