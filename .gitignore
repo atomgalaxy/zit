@@ -1,3 +1,7 @@
 bazel-*/*
 bazel-*
 compile_commands.json
+.vs/*
+x64/*
+Debug/*
+atomgalaxy.vcxproj.user
