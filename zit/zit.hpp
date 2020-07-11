@@ -89,7 +89,8 @@ using crtp_base =
 
 template <typename Impl, auto const &... cpos>
 struct handle : crtp_base<handle<Impl, cpos...>, cpos>... {
-  handle(auto &&... args)
+  template <typename... Args>
+    handle(Args&&... args)
       : _impl(zit::construct((Impl *)nullptr,
                              std::forward<decltype(args)>(args)...)) {}
 
@@ -101,11 +102,13 @@ struct handle : crtp_base<handle<Impl, cpos...>, cpos>... {
     return *this;
   }
 
-  friend inline auto tag_invoke(auto cpo, auto &&h, auto &&... as) noexcept(
+  template<typename CPO, typename H, typename... AS>
+  friend inline auto tag_invoke(CPO cpo, H &&h, AS &&... as) noexcept(
       noexcept(cpo(zit::forward_like<decltype(h)>(*h._impl),
                    std::forward<decltype(as)>(as)...)))
       -> decltype(cpo(zit::forward_like<decltype(h)>(*h._impl),
-                      std::forward<decltype(as)>(as)...)) {
+                      std::forward<decltype(as)>(as)...)) 
+  {
     return cpo(zit::forward_like<decltype(h)>(*h._impl),
                std::forward<decltype(as)>(as)...);
   }

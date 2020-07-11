@@ -6,7 +6,8 @@
 #include <type_traits>
 
 inline constexpr struct cpo_t final {
-  inline constexpr auto operator()(auto &&... as) const
+  template <typename... AS>
+  inline constexpr auto operator()(AS &&... as) const
       noexcept(zit::is_nothrow_tag_invocable_v<cpo_t, decltype(as)...>)
           -> zit::tag_invoke_result_t<cpo_t, decltype(as)...> {
     return zit::tag_invoke(*this, (decltype(as) &&)as...);
