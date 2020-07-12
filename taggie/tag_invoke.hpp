@@ -98,7 +98,7 @@ using copy_rvref_t = std::conditional_t<std::is_rvalue_reference_v<T>,
                                         std::add_rvalue_reference_t<U>, U>;
 template <typename T, typename U>
 using copy_lvref_t = std::conditional_t<std::is_lvalue_reference_v<T>,
-                                        std::add_rvalue_reference_t<U>, U>;
+                                        std::add_lvalue_reference_t<U>, U>;
 template <typename T, typename U>
 using copy_ref_t = copy_rvref_t<T, copy_lvref_t<T, U>>;
 template <typename T, typename U>
@@ -110,13 +110,20 @@ using copy_volatile_t =
     std::conditional_t<std::is_volatile_v<std::remove_reference_t<T>>,
                        std::add_volatile_t<U>, U>;
 template <typename T, typename U>
-using copy_cvref_t = copy_const_t<T, copy_volatile_t<T, copy_ref_t<T, U>>>;
+using copy_cvref_t = copy_ref_t<T, copy_const_t<T, copy_volatile_t<T, U>>>;
+
 template <typename T, typename U>
 always_inline inline constexpr auto forward_like(U &&x) noexcept
     -> copy_cvref_t<T, std::remove_reference_t<U>> {
   return std::forward<copy_cvref_t<T, std::remove_reference_t<U>>>(x);
 }
 
-} // namespace zit
+template <typename T, typename U>
+always_inline inline constexpr auto forward_cast(U &&x) noexcept
+    -> copy_cvref_t<U &&, std::remove_cvref_t<T>> {
+  return (copy_cvref_t<U &&, std::remove_cvref_t<T>>)x;
+}
+
+} // namespace taggie
 
 #undef always_inline
