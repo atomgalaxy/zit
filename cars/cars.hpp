@@ -1,4 +1,4 @@
-#include "zit/zit.hpp"
+#include "../zit/zit.hpp"
 
 #include <memory>
 #include <ostream>
