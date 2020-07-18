@@ -1,6 +1,6 @@
 /// Just tests that the tag_invoke extracted from unifex works.
 
-#include "../taggie/tag_invoke.hpp"
+#include "taggie/tag_invoke.hpp"
 
 #include <iostream>
 #include <type_traits>

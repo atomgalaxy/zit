@@ -107,7 +107,7 @@
     <ClCompile Include="cars\cars_impl_1.cpp" />
     <ClCompile Include="cars\cars_impl_2.cpp" />
     <ClCompile Include="cars\cars_main.cpp" />
-    <ClCompile Include="test\test_tag_invoke.cpp" />
+    <ClCompile Include="zit\test\test_tag_invoke.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cars\cars.hpp" />

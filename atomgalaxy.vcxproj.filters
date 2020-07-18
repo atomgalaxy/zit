@@ -24,7 +24,7 @@
     <ClCompile Include="cars\cars_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test\test_tag_invoke.cpp">
+    <ClCompile Include="zit\test\test_tag_invoke.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
